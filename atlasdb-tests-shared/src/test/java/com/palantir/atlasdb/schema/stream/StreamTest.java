@@ -40,6 +40,7 @@ import java.util.concurrent.Future;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -96,7 +97,9 @@ public class StreamTest extends AtlasDbTestCase {
             PersistentStreamStore store = StreamTestStreamStore.of(txManager, StreamTestTableFactory.of());
             Optional<InputStream> inputStream = store.loadSingleStream(t, streamId);
             assertTrue(inputStream.isPresent());
-            assertEquals(data.length, inputStream.get().read(data, 0, data.length));
+            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+            outputStream.write(inputStream.get());
+            assertArrayEquals(data, outputStream.toByteArray());
             return null;
         });
     }
